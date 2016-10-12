@@ -3,11 +3,10 @@
 	 * These are the regular expression rules that we use to validate the product ID and product name
 	 * alpha-numeric, dashes, underscores, or periods
 	 *
-	 * @var string
+	 * @var current CI_Controller instance
 	 */
 function query_finalize($instance){
-    $instance->db->where("row_active",1);
-    return $instance->db->get();
+    $instance->db->where("row_active",1);    
 }
 /**
 	 * Check if any user is logged in
@@ -38,4 +37,16 @@ function check_session(){
     }
 
     return null;
+}
+
+function user_logout(){
+    $ci =& get_instance();
+    
+    $ci->session->sess_destroy();
+}
+function encrypt($str){
+    return base64_decode($str);
+}
+function decrypt($str){
+    return base64_encode($str);
 }

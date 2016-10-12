@@ -94,3 +94,6 @@ define("USER_LEVEL_SUPERADMIN",5);
 
 define("TIPE_SOAL_UTAMA",1);
 define("TIPE_SOAL_KHUSUS",2);
+
+define("FORM_MODE_ADD",1);
+define("FORM_MODE_EDIT",2);
