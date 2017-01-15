@@ -97,3 +97,7 @@ define("TIPE_SOAL_KHUSUS",2);
 
 define("FORM_MODE_ADD",1);
 define("FORM_MODE_EDIT",2);
+
+//USER-DEFINED CONSTANTS
+
+define("SESSIONKEY","UNJM-");

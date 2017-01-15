@@ -500,6 +500,28 @@ if ( ! is_php('5.4'))
 	$CI = new $class();
 
 /*
+ * Now checking for IAuthenticator Implementation
+ * Custom Made Code
+ */        
+        if($CI instanceof IAuthenticator){
+            $CI->SetAuthOptions();
+            $authengine = Authenticator::GetContext();  
+            $authengine instanceof Authenticator;
+            $credinfo = $CI->GetAuthOptions();                        
+            
+            if(isset($credinfo[$method])){
+                if($credinfo[$method]['authenticate'] == true && !$authengine->IsLoggedIn()){
+                    $CI->OnFailedAuthentication(Authenticator::$ERRORCODE_UNAUTHORIZED);
+                    
+                }
+                if($credinfo[$method]['authenticate'] == true && isset($credinfo[$method]['level'])){
+                    if($authengine->VerifyLevel($credinfo[$method]['level'])){
+                        $CI->OnFailedAuthentication(Authenticator::$ERRORCODE_LOWER_ACCESS_LEVEL);
+                    }
+                }
+            }
+        }
+/*
  * ------------------------------------------------------
  *  Is there a "post_controller_constructor" hook?
  * ------------------------------------------------------
@@ -511,6 +533,7 @@ if ( ! is_php('5.4'))
  *  Call the requested method
  * ------------------------------------------------------
  */
+
 	call_user_func_array(array(&$CI, $method), $params);
 
 	// Mark a benchmark end point
