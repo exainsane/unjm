@@ -17,11 +17,19 @@ class Home extends Ext_Controller implements IAuthenticator {
     
     function __construct() {
         parent::__construct();
-                                
+                
+        $this->SetHeaderAndFooter("home/header", "home/footer");
     }
         
-    function index(){        
-        echo "Hello World!";        
+    function index(){    
+        $this->SetUIData("about", $this->db->get("ui_about")->result());
+        $this->SetUIData("slider", $this->db->get("ui_slider")->result());
+        $this->SetUIData("services", $this->db->get("ui_services")->result());
+        $this->SetUIData("team", $this->db->get("ui_team")->result());
+        $this->SetUIData("testimoni", $this->db->get("ui_testimoni")->result());
+        $this->SetUIData("blog", $this->db->get("ui_blog")->result());
+        
+        $this->LoadUI("home/default");
     }
     function foo(){
         $u = new model_user();
@@ -79,6 +87,21 @@ class Home extends Ext_Controller implements IAuthenticator {
         
         echo $auth->last_error;
     }
-
-
+    public function generateclass(){
+        $tables = $this->db->list_tables();
+        
+        foreach ($tables as $table) {
+            $flds = $this->dbm->fields($table);           
+            echo "<br>class ".$table." extends EntityModel{ <br>";
+            echo "&nbsp;&nbsp;&nbsp;function __construct(){<br>";
+            echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parent::__construct(\"".$table."\");<br>";
+            echo "&nbsp;&nbsp;&nbsp;}";
+            
+            foreach ($flds as $fld){
+                echo "&nbsp;&nbsp;&nbsp;public \$".$fld.";<br>";
+            }
+            
+            echo "}";
+        }
+    }
 }

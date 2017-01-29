@@ -44,9 +44,23 @@ function user_logout(){
     
     $ci->session->sess_destroy();
 }
-function encrypt($str){
+function encrypt($str,$asurl = false){
+    $s = base64_encode($str);
+    return ($asurl == true)? urlencode($s) : $s;
+}
+function decrypt($str,$asurl = false){
+    if($asurl){
+        $str = urldecode($str);
+    }
     return base64_decode($str);
 }
-function decrypt($str){
-    return base64_encode($str);
+
+function limit_words($string, $word_limit){
+    $words = explode(" ",$string);
+    return implode(" ",array_splice($words,0,$word_limit));
+}
+function singlerow($q){
+    $r = $q->result();
+    $r = end($r);
+    return $r;
 }

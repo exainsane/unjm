@@ -22,6 +22,9 @@ abstract class EntityModel{
     protected function IsModelCRUD(){
         return !isset($this->_attrib['model_crud']) || $this->_attrib['model_crud'] = true;
     }
+    public function GetIDField(){
+        return $this->_attrib['key'];
+    }
     public static function GetData($obj,$wherequery = null, $orderby = null, $limit = null){
         $data = array();        
         
@@ -80,7 +83,13 @@ abstract class EntityModel{
         $ci =& get_instance();
         
         $idk = $this->_attrib['key'];
-        $id = $this->$idk;
+        $id = null;
+        
+        if($this instanceof IUseEncodedID){
+            $id = $this->GetID();
+        }else{
+            $id = $this->$idk;
+        }
         
         $ci->db->from($this->_attrib['table'])
                 ->where("id",$id);
@@ -132,6 +141,13 @@ abstract class EntityModel{
         $ci->db->select("*")
                 ->from($this->_attrib['table']);
         
+        if($this instanceof IUseEncodedID){
+            $idfield = $this->GetIDField();
+            
+            $attrs[$idfield] = $this->GetID();
+                        
+        }
+        
         foreach ($attrs as $key => $value) {            
             if($value == null) continue;
             
@@ -145,7 +161,19 @@ abstract class EntityModel{
         
         unset($attrs['_attrib']);
         
-        foreach ($attrs as $key => $value){
+        if($this instanceof IUseEncodedID){           
+            $idfield = $this->GetIDField();
+            if(isset($obj->$idfield)){
+                $this->SetID($obj->$idfield);
+            }else if(isset($obj[$idfield])){
+                $this->SetID($obj[$idfield]);
+            }
+            //We no longer use ID Field here, since its encoded
+            unset($attrs[$idfield]);
+        }
+        
+        foreach ($attrs as $key => $value){                        
+            
             if(is_array($obj)){
                 if(isset($obj[$key])){
                     $this->$key = $obj[$key];
@@ -170,30 +198,48 @@ abstract class EntityModel{
         unset($attrs[$this->_attrib['key']]);
         unset($attrs['_attrib']);
         
-        $cols = "";
-        $values = "";
+        $idk = $this->_attrib['key'];
+        $id = null;
+                
+        if($this instanceof IUseEncodedID){            
+            $id = $this->GetID();            
+        }else{
+            $id = $this->$idk;
+        }        
         
-//        $pos = 0; $lim = count($attrs) - 1;
+        $cols = "";
+        $values = "";        
+        $set = 0;
         foreach ($attrs as $key => $value) {
             if($value == null) continue;
             $ci->db->set($key,$value);
-//            $cols += $key;
-//            $values += "'"+$value+"'";
-//            
-//            if($pos < $lim){
-//                $cols += ",";
-//                $values += ",";
-//            }
+            $set++;
         }
-        $idk = $this->_attrib['key'];
-        
+        if($set == 0 ) show_error ("Error updating Entity : 0 Fields changed!");
         $ci->db->from($table);
-        $ci->db->where($this->_attrib['key'], $this->$idk);
+        $ci->db->where($this->_attrib['key'], $id);
+        
         $ci->db->update();
     }
     function __construct($tablename,$keyid = "id"){
         $this->_attrib['table'] = $tablename;
         $this->_attrib['key'] = $keyid;
+        $this->_attrib['model_crud'] = false;
+    }
+}
+
+
+
+class AuthTokenModel extends EntityModel{
+    public $id;
+    public $for_user;
+    public $token;
+    public $valid_until;
+    
+    function __construct() {
+        parent::__construct("t_auth_token");
+        
+        $this->SetModelCRUD();
     }
 }
 
@@ -225,15 +271,119 @@ class model_user extends EntityModel implements IUsePasswordField{
 
 }
 
-class AuthTokenModel extends EntityModel{
-    public $id;
-    public $for_user;
-    public $token;
-    public $valid_until;
-    
+class ModelUIAbout extends EntityModel implements IUseEncodedID{
     function __construct() {
-        parent::__construct("t_auth_token");
-        
-        $this->SetModelCRUD();
+        parent::__construct("ui_about");
     }
+
+    public function GetID() {
+        return base64_decode($this->id);
+    }
+
+    public function SetID($id) {
+        $this->id = base64_encode($id);
+    }
+
+    public $id;
+    public $about;
+}
+
+class ModelUIContact extends EntityModel implements IUseEncodedID{
+    public $id;
+    public $name;
+    public $email;
+    public $message;
+    function __construct() {
+        parent::__construct("ui_contact");
+    }
+    public function GetID() {
+        return decrypt($this->id);
+    }
+
+    public function SetID($id) {
+        $this->id = encrypt($id);
+    }
+
+}
+class ModelUIBlog extends EntityModel implements IUseEncodedID{
+    public function GetID() {
+        return decrypt($this->id);
+    }
+
+    public function SetID($id) {
+        $this->id = encrypt($id);
+    }
+
+    function __construct(){
+      parent::__construct("ui_blog");
+   }   
+   public $id;
+   public $judul;
+   public $des;
+   public $img;
+}
+class ModelUIServices extends EntityModel implements IUseEncodedID{
+    public function GetID() {
+        return decrypt($this->id);
+    }
+
+    public function SetID($id) {
+        $this->id = encrypt($id);
+    }
+   function __construct(){
+      parent::__construct("ui_services");
+   }   
+   public $id;
+   public $judul;
+   public $des;
+   public $icon;
+}
+class ModelUISlider extends EntityModel implements IUseEncodedID{
+    public function GetID() {
+        return decrypt($this->id);
+    }
+
+    public function SetID($id) {
+        $this->id = encrypt($id);
+    }
+   function __construct(){
+      parent::__construct("ui_slider");
+   }   
+   public $id;
+   public $judul;
+   public $des;
+   public $class;
+}
+class ModelUITeam extends EntityModel implements IUseEncodedID{
+    public function GetID() {
+        return decrypt($this->id);
+    }
+
+    public function SetID($id) {
+        $this->id = encrypt($id);
+    }
+   function __construct(){
+      parent::__construct("ui_team");
+   }   
+   public $id;
+   public $nama;
+   public $des;
+   public $img;
+   public $job;
+}
+class ModelUITestimoni extends EntityModel implements IUseEncodedID{
+    public function GetID() {
+        return decrypt($this->id);
+    }
+
+    public function SetID($id) {
+        $this->id = encrypt($id);
+    }
+   function __construct(){
+      parent::__construct("ui_testimoni");
+   }   
+   public $id;
+   public $judul;
+   public $des;
+   public $nama;
 }

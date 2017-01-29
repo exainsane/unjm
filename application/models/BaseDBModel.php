@@ -48,9 +48,9 @@ class BaseDBModel extends CI_Model {
     /**
      * 
      */
-    public function delete($table, $id){
-        $this->db->set("row_active",0);
-        $this->db->where("id",$id);
+    public function delete($table, $id, $idfield = "id"){
+        $this->db->set("_enabled",0);
+        $this->db->where($idfield,$id);
         $this->db->update($table);        
     }
     
