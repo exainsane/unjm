@@ -511,3 +511,20 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+
+/*
+ * Custom app-related config variables
+ */
+
+$config['UPLOAD_LOCATION'] = "assets/images/uploads/";
+$config['UPLOAD_NAMING'] = function($ext){
+    $t = time();
+    for($i = 0; $i < rand(1, 9);$i++){
+        $t .= rand(1,9);
+    }
+    
+    $filename = $t.$ext;
+    
+    return $filename;
+};

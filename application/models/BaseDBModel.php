@@ -14,6 +14,7 @@
  * @author exain
  */
 class BaseDBModel extends CI_Model {
+    public static $DB_CRUD = 1;
     /** Mengambil daftar field dalam database
      * 
      * @param string $table
@@ -48,10 +49,21 @@ class BaseDBModel extends CI_Model {
     /**
      * 
      */
-    public function delete($table, $id, $idfield = "id"){
-        $this->db->set("_enabled",0);
-        $this->db->where($idfield,$id);
-        $this->db->update($table);        
+    public function delete($table, $id, $idfield = "id", $crud = 0){
+        if(in_array("_enable", $this->fields($table))){
+            $crud = $crud != 0 ? $crud : 0;
+        }else
+        {
+            $crud = 1;
+        }
+        if($crud == 0){
+            $this->db->set("_enabled",0);
+            $this->db->where($idfield,$id);
+            $this->db->update($table);        
+        }else if($crud == self::$DB_CRUD){
+            $this->db->where($idfield,$id);
+            $this->db->delete($table);        
+        }
     }
     
     public function update($table,$array){

@@ -12,6 +12,38 @@ class Entity extends CI_Model{
     
 }
 abstract class EntityModel{
+    public static function ManageUploadFile($formlabel){
+        $ci =& get_instance();
+        $ci->load->library("upload");                
+        
+        if(!isset($_FILES[$formlabel]) || $_FILES[$formlabel]['error'] == 4){
+            if($ci->input->post("old-".$formlabel) != null)
+            {
+                return $ci->input->post("old-".$formlabel);
+            }
+            return;
+        }
+        
+        $uploaded_name = $_FILES[$formlabel]['name'];
+        
+        $savefilepath = $ci->config->item("UPLOAD_LOCATION");
+        $naming = $ci->config->item("UPLOAD_NAMING");
+        
+        $config['upload_path'] = $savefilepath;
+        $config['file_name'] = $naming(get_filename_extension($uploaded_name));
+        $config['file_ext_tolower'] = $savefilepath;
+        $config['allowed_types'] = "jpg|png";
+        
+        recursive_check_add_dir($config['upload_path'], "/");
+        
+        $ci->upload->initialize($config);
+        
+        if(!$ci->upload->do_upload($formlabel)){
+            show_error("Error on uploading! : ".$ci->upload->display_errors());            
+        }
+        
+        return $savefilepath.$ci->upload->data("file_name");
+    }
     protected $_attrib = array();
     protected function SetModelCRUD(){
         $this->_attrib['model_crud'] = true;
@@ -305,7 +337,7 @@ class ModelUIContact extends EntityModel implements IUseEncodedID{
     }
 
 }
-class ModelUIBlog extends EntityModel implements IUseEncodedID{
+class ModelUIBlog extends EntityModel implements IUseEncodedID, IFileUpload{
     public function GetID() {
         return decrypt($this->id);
     }
@@ -316,11 +348,21 @@ class ModelUIBlog extends EntityModel implements IUseEncodedID{
 
     function __construct(){
       parent::__construct("ui_blog");
-   }   
-   public $id;
-   public $judul;
-   public $des;
-   public $img;
+   }
+
+    public function SaveFileUpload() {
+        $this->img = EntityModel::ManageUploadFile("form-img");
+        
+        return $this->img;
+    }
+    public function GetFileField() {
+        return "img";
+    }
+
+    public $id;
+    public $judul;
+    public $des;
+    public $img;
 }
 class ModelUIServices extends EntityModel implements IUseEncodedID{
     public function GetID() {
@@ -354,7 +396,7 @@ class ModelUISlider extends EntityModel implements IUseEncodedID{
    public $des;
    public $class;
 }
-class ModelUITeam extends EntityModel implements IUseEncodedID{
+class ModelUITeam extends EntityModel implements IUseEncodedID, IFileUpload{
     public function GetID() {
         return decrypt($this->id);
     }
@@ -364,12 +406,23 @@ class ModelUITeam extends EntityModel implements IUseEncodedID{
     }
    function __construct(){
       parent::__construct("ui_team");
-   }   
-   public $id;
-   public $nama;
-   public $des;
-   public $img;
-   public $job;
+   }
+
+    public function GetFileField() {
+        return "img";
+    }
+
+    public function SaveFileUpload() {
+        $this->img = EntityModel::ManageUploadFile("form-img");
+        
+        return $this->img;
+    }
+
+    public $id;
+    public $nama;
+    public $des;
+    public $img;
+    public $job;
 }
 class ModelUITestimoni extends EntityModel implements IUseEncodedID{
     public function GetID() {

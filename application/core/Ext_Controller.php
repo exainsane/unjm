@@ -14,6 +14,10 @@ interface IUseEncodedID{
     function SetID($id);
     function GetID();
 }
+interface IFileUpload{
+    function SaveFileUpload();
+    function GetFileField();
+}
 class Ext_Controller extends CI_Controller{    
     protected $cfg = array();
     protected $cred = array();
@@ -40,6 +44,10 @@ class Ext_Controller extends CI_Controller{
             if(isset($postarr["form-".$idfield])){
                 $postarr["form-".$idfield] = decrypt($postarr["form-".$idfield], true);
             }
+        }
+        if($obj instanceof IFileUpload){
+            $filefield = $obj->GetFileField();            
+            $postarr[$filefield] = $obj->SaveFileUpload();
         }
         
         foreach ($postarr as $key=>$value){
@@ -237,10 +245,10 @@ class IOManager{
         
         if($this->mode == "delete"){
             if($this->data == null){
-                $ci->dbm->delete($this->table, $this->id, $this->idfield);                
+                $this->ci->dbm->delete($this->table, $this->id, $this->idfield);                    
             }else
             {
-                $this->data->Delete();                
+                $this->data->Delete();                        
             }
         }
         

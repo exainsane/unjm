@@ -73,11 +73,11 @@
                   <li><a href="index.php"><i class="fa fa-home"></i> Home </a></li>
                   <li><a><i class="fa fa-edit"></i> Tambah Data <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="form_post.php">Post Blog</a></li>
-                      <li><a href="form_service.php">Service</a></li>
-                      <li><a href="form_slider.php">Slider</a></li>
-                      <li><a href="form_team.php">Team</a></li>
-                      <li><a href="form_testimoni.php">Testimoni</a></li>
+                      <li><a href="<?php echo site_url("admin/post/new") ?>">Post Blog</a></li>
+                      <li><a href="<?php echo site_url("admin/services/new") ?>">Service</a></li>
+                      <li><a href="<?php echo site_url("admin/slider/new") ?>">Slider</a></li>
+                      <li><a href="<?php echo site_url("admin/team/new") ?>">Team</a></li>
+                      <li><a href="<?php echo site_url("admin/testimoni/new") ?>">Testimoni</a></li>
                     </ul>
                   </li>                  
                   <li><a><i class="fa fa-table"></i> Tables <span class="fa fa-chevron-down"></span></a>
@@ -85,7 +85,7 @@
                       <li><a href="<?php echo site_url("admin/about") ?>">About</a></li>
                       <li><a href="<?php echo site_url("admin/contact") ?>">Contact</a></li>
                       <li><a href="<?php echo site_url("admin/post") ?>">Post Blog</a></li>
-                      <li><a href="<?php echo site_url("admin/service") ?>">Service</a></li>
+                      <li><a href="<?php echo site_url("admin/services") ?>">Service</a></li>
                       <li><a href="<?php echo site_url("admin/slider") ?>">Slider</a></li>
                       <li><a href="<?php echo site_url("admin/team") ?>">Team</a></li>
                       <li><a href="<?php echo site_url("admin/testimoni") ?>">Testimoni</a></li>

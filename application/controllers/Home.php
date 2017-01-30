@@ -21,7 +21,7 @@ class Home extends Ext_Controller implements IAuthenticator {
         $this->SetHeaderAndFooter("home/header", "home/footer");
     }
         
-    function index(){    
+    function index(){                   
         $this->SetUIData("about", $this->db->get("ui_about")->result());
         $this->SetUIData("slider", $this->db->get("ui_slider")->result());
         $this->SetUIData("services", $this->db->get("ui_services")->result());
